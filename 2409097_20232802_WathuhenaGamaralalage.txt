@@ -1,0 +1,340 @@
+CREATE DATABASE Builders_Citadel;
+
+CREATE TABLE Customer_Company
+(Company_Customer_ID char(4),
+ Company_Reg_number char(10) UNIQUE NOT NULL,
+ Company_name varchar (100) NOT NULL,
+ Address varchar (100) NOT NULL,
+ Telephone varchar (15) NOT NULL,
+ email varchar (100) UNIQUE NOT NULL,
+ Sector varchar (50),
+ Income decimal (12,2),
+ CONSTRAINT CC_ID_PK PRIMARY KEY (Company_customer_ID)
+);
+
+CREATE TABLE Customer_Individual
+(Individual_Customer_ID char (4),
+ NIC varchar (12) UNIQUE NOT NULL,
+ Individual_Name varchar(200) NOT NULL,
+ Gender char(1) NOT NULL,
+ Address varchar(100) NOT NULL,
+ Telephone varchar(15) NOT NULL,
+ email varchar(100) UNIQUE NOT NULL,
+ CONSTRAINT IC_ID_PK PRIMARY KEY (Individual_Customer_ID)
+);
+
+CREATE TABLE Project
+(Project_ID char (3),
+ Project_Name varchar(100) NOT NULL,
+ Project_Type varchar(20) NOT NULL,
+ Location varchar(20) NOT NULL,
+ Start_Date date NOT NULL,
+ EstimateCom_Date date NOT NULL,
+ ActualCom_Date date,
+ SpecialPro_Requirement varchar(100),
+ Current_progress varchar(20) NOT NULL,
+ Company_Customer_ID char(4),
+ Individual_Customer_ID char(4),
+ CONSTRAINT pro_ID_PK PRIMARY KEY (Project_ID),
+ CONSTRAINT pro_CC_FK FOREIGN KEY (Company_Customer_ID) REFERENCES Customer_Company(Company_Customer_ID),
+ CONSTRAINT pro_IC_FK FOREIGN KEY (Individual_Customer_ID) REFERENCES Customer_Individual(Individual_Customer_ID)
+);
+
+CREATE TABLE Payment 
+(Payment_ID char(5),
+ Instalment_plan varchar (20) NOT NULL,
+ Payment_amount decimal (9,2) NOT NULL,
+ Payment_method varchar (20) NOT NULL,
+ Payment_date date NOT NULL,
+ Payment_status varchar (20) NOT NULL,
+ Company_Customer_ID char(4),
+ Individual_Customer_ID char(4),
+ Project_ID char(3),
+ CONSTRAINT pay_ID_PK PRIMARY KEY (Payment_ID),
+ CONSTRAINT p_company_FK FOREIGN KEY (Company_Customer_ID) REFERENCES Customer_Company(Company_Customer_ID),
+ CONSTRAINT p_individual_FK FOREIGN KEY (Individual_Customer_ID) REFERENCES Customer_Individual(Individual_Customer_ID),
+ CONSTRAINT p_pro_FK FOREIGN KEY (Project_ID) REFERENCES Project (Project_ID)  
+);
+
+CREATE TABLE Assignment
+(Assignment_ID char (3),
+ Assignment_Name varchar(100) NOT NULL,
+ Start_date date NOT NULL,
+ End_date date,
+ CONSTRAINT As_ID_PK PRIMARY KEY (Assignment_ID)
+);
+
+
+CREATE TABLE Staff
+(Staff_ID char (4),
+ First_name varchar (20) NOT NULL,
+ Last_name varchar (20) NOT NULL,
+ Address varchar (100) NOT NULL,
+ Telephone varchar (15),
+ DOB date NOT NULL,
+ email_address varchar (100) UNIQUE NOT NULL,
+ Supervisor_ID char (4),
+ CONSTRAINT s_ID_PK PRIMARY KEY (Staff_ID),
+ CONSTRAINT Supervisor_ID FOREIGN KEY (Supervisor_ID) REFERENCES Staff(Staff_ID)
+);
+
+CREATE TABLE Position
+(Position_ID char (3),
+ Position_Name varchar(20) NOT NULL,
+ Salary decimal (8,2) NOT NULL,
+ CONSTRAINT po_ID_PK PRIMARY KEY (Position_ID)
+);
+
+CREATE TABLE Position_Supervisor
+(Position_ID char (3),
+ Privilege varchar (100),
+ Allowance decimal (7,2),
+ CONSTRAINT PS_ID_FK FOREIGN KEY (Position_ID) REFERENCES Position (Position_ID),
+ CONSTRAINT PS_ID_PK PRIMARY KEY (Position_ID)
+);
+
+CREATE TABLE Staff_Position
+(Staff_ID char (4),
+ Position_ID char (3),
+ Assigned_date date,
+ CONSTRAINT SPS_ID_FK FOREIGN KEY (Staff_ID) REFERENCES Staff (Staff_ID),
+ CONSTRAINT SPP_ID_FK FOREIGN KEY (Position_ID) REFERENCES Position (Position_ID),
+ CONSTRAINT SPO_ID_PK PRIMARY KEY (Staff_ID,Position_ID,Assigned_date)
+);
+
+CREATE TABLE Assignment_Allocation
+(Project_ID char (3),
+ Staff_ID char (4),
+ Assignment_ID char (3),
+ Date_of_the_week date NOT NULL,
+ No_of_working_hours varchar (4),
+ CONSTRAINT DAS_pro_FK FOREIGN KEY (Project_ID) REFERENCES Project (Project_ID),
+ CONSTRAINT DAS_sta_FK FOREIGN KEY (Staff_ID) REFERENCES Staff (Staff_ID),
+ CONSTRAINT DAS_AS_FK FOREIGN KEY (Assignment_ID) REFERENCES Assignment (Assignment_ID),
+ CONSTRAINT DAS_PK PRIMARY KEY (Project_ID,Staff_ID,Assignment_ID,Date_of_the_week) 
+);
+
+
+
+INSERT INTO customer_company (Company_Customer_ID,Company_Reg_number,Company_name,Address,Telephone,email,Sector,Income)
+VALUES
+('CC01',20231001,'David Motors','No. 64, Peterson Road, Colombo','0113456788','dm@gmail.com','Motor',4500000000.00),
+('CC02',20231002,'Saman Creators','No. 88, Lake Side, Kandy','0812345675','sc@gmail.com','Technology',850000000.00),
+('CC03',20231003,'Nihal Fashions','No. 56, Temple Lane, Matara','0414567896','nf@gmail.com','Fashion',3200000000.00),
+('CC04',20231004,'Pet Home','No. 45/B, Station Road, Galle','0913457865','ph@gmail.com','Market',1200000000.00),
+('CC05',20231005,'Raj Hospitals','No.5/C/L, Hamilton Road, Colombo','0112567896','rh@gmail.com','Health',890000000.00),
+('CC06',20231006,'Flower Decorators','No.36, Colombo Road, Kandy','0814563478','fd@gmail.com','Design',3600000000.00),
+('CC07',20231007,'S&S Technologies','No.56, Siva Road, Miriswatta, Gampaha','0334245786','sst@gmail.com','Technology',8700000000.00),
+('CC08',20231008,'Grapes Hotel','No.67, 2nd Lane, Kaluthara','0346712312','gh@gmail.com','Hotel',9000000000.00);
+
+
+INSERT INTO customer_individual(Individual_Customer_ID,NIC,Individual_Name,Gender,Address,Telephone,email)
+VALUES
+('CI01',199012347896,'Paul Martin','M','No. 45. High Level Road, Colombo','0113456548','pm1@gmail.com'),
+('CI02',198978654589,'Nancy Drew','F','No. 88. Madduma Bandra Lane, Kandy','0812345675','nd1@gmail.com'),
+('CI03',199710231003,'Nilu Mendis','F','No. 4/K, City Lane, Colombo','0114564596','nm1@gmail.com'),
+('CI04',195856784534,'Simon Cowell','M','No. 59, Perera Road, Galle','0917867865','sc1@gmail.com'),
+('CI05',196727531005,'Taylor Anderson','M','No. 77, Aaru Road, Jaffna','0212564626','ta1@gmail.com'),
+('CI06',197823261006,'Lilly Collins','F','No. 27, Queen Road, Kandy','0814563478','lc1@gmail.com'),
+('CI07',198940255307,'Andy Murry','M','No. 37/E, Dehiowita Main Street, Kegalle','0364244486','am1@gmail.com'),
+('CI08',198720456708,'Gaz Peterson','M','No.331/N, Main Street, Dambulla','0666719812','gp1@gmail.com');
+
+INSERT INTO Assignment (Assignment_ID,Assignment_name,Start_date,End_date)
+VALUES
+('A01','Floor Design','2023-11-09',NULL),
+('A02','Wall Painting','2023-12-19',NULL),
+('A03','Cleaning Process','2023-01-09','2023-11-12'),
+('A04','Roof Design','2023-01-31','2024-02-27'),
+('A05','Electricity Circuit Design','2023-06-03','2023-09-13'),
+('A06','Finance Budget','2023-06-09','2023-07-15'),
+('A07','Gather Customer Requirements','2023-08-23',NULL),
+('A08','Marketing Process','2023-04-18',NULL),
+('A09','Connecting Constructors','2022-11-12',NULL),
+('A10','Managing Budget','2023-03-09',NULL),
+('A11','Planning Architecter','2023-02-18',NULL),
+('A12','Creating Solutions','2022-10-19',NULL),
+('A13','Transport Managing','2023-01-15',NULL),
+('A14','Utility Process','2023-04-05',NULL),
+('A15','Interior Design','2023-05-13',NULL);
+
+
+
+
+INSERT INTO Project (Project_ID,Project_Name,Project_Type,Location,Start_Date,EstimateCom_Date,ActualCom_Date,SpecialPro_Requirement,Current_progress,Company_Customer_ID,Individual_Customer_ID)
+VALUES
+('P01','Secret Achivements','Construction','Colombo','2023-12-15','2024-10-15',NULL,'Frist Aid','Ongoing','CC02',NULL),
+('P02','Project Rock','Construction','Gampha','2023-11-25','2024-03-23','2024-03-20',NULL,'Done','CC07',NULL),
+('P03','Motivated','Renovation','Kandy','2024-01-23','2024-06-23',NULL,'Risk Assesments','Need approval',NULL,'CI05'),
+('P04','Far Away','Construction','Jaffna','2023-10-02','2024-05-07',NULL,'Proper Equipments','Ongoing',NULL,'CI02'),
+('P05','C&S','Renovation','Kaluthara','2023-12-04','2024-02-19','2024-02-24','NULL','Done','CC04',NULL),
+('P06','Cartoon','Construction','Colombo','2023-11-09','2024-03-30','2024-03-28','Trainied Staff','Done',NULL,'CI03'),
+('P07','D&V','Construction','Matara','2023-12-30','2024-01-31','2024-02-05','Safety Equipments','Done',NULL,'CI07'),
+('P08','Diverse','Renovation','Ragama','2023-09-04','2024-05-30',NULL,'Measuring Equipments','Ongoing','CC06',NULL),
+('P09','Colors','Renovation','Galle','2023-12-30','2024-02-29','2024-02-26',NULL,'Done','CC08',NULL),
+('P10','Modern Structure','Construction','Kandy','2023-12-15','2024-08-15',NULL,NULL,'Need approval',NULL,'CI01'),
+('P11','Actural Result','Construction','Colombo','2023-09-20','2024-02-13','2024-02-09',NULL,'Done','CC05',NULL),
+('P12','S&S','Construction','Nuwara Eliya','2023-08-12','2024-04-07','2024-03-25','First Aid','Done',NULL,'CI04'),
+('P13','Creation','Renovation','Jaffna','2024-01-10','2024-02-29','2024-03-02','NULL','Done',NULL,'CI06'),
+('P14','New','Renovation','Colombo','2023-11-05','2024-04-10',NULL,'Trained Staff','Ongoing','CC08',NULL),
+('P15','Wasted','Construction','Kandy','2023-12-09','2024-02-10',NULL,NULL,'Canceled','CC03',NULL),
+('P16','Wonder','Construction','Colombo','2024-01-10','2024-05-30',NULL,'Fire Plan','Ongoing',NULL,'CI07'),
+('P17','Pure Talent','Renovation','Matara','2023-10-09','2024-12-09',NULL,'Trained Staff','Need approval','CC01',NULL),
+('P18','Wonder World','Renovation','Colombo','2023-08-11','2023-12-28','2023-12-30',NULL,'Done',NULL,'CI08'),
+('P19','Hello World','Renovation','Galle','2024-01-25','2025-01-09',NULL,'First Aid','Ongoing',NULL,'CI06'),
+('P20','Heaven','Construction','Kandy','2024-03-20','2026-06-20',NULL,'Safety Equipments','Need approval','CC05',NULL);
+
+
+INSERT INTO Position (Position_ID,Position_Name,Salary)
+VALUES
+('S01','Field Engineer',250000.00),
+('S02','Architect',300000.00),
+('S03','Design Manager',350000.00),
+('S04','Interior Designer',300000.00),
+('S05','Finance Manager',250000.00),
+('S06','Estimator',250000.00),
+('S07','Project Manager',300000.00),
+('S08','Director',400000.00),
+('S09','Civil Engineer',250000.00),
+('S10','Database Manager',250000.00),
+('S11','Cashier',250000.00),
+('S12','Laborer',90000.00),
+('S13','Duty Manager',200000.00);
+
+
+INSERT INTO Position_Supervisor (Position_ID,Privilege,Allowance)
+VALUES
+('S03','Flexible Schedule',2300.00),
+('S05','Work From Home',5200.00),
+('S07','Create Own Team For Work',8000.00),
+('S10','Work From Home',4500.00),
+('S13','Design Own Working Space',7600.00);
+
+
+INSERT INTO Staff(Staff_ID,First_name,Last_name,Address,Telephone,DOB,email_address,Supervisor_ID)
+VALUES
+(1001,'Sam','Anderson','No. 45, Fonseka Road, Colombo','0778965423','1990-10-23','sam@gmail.com',NULL),
+(1002,'Cole','Sprouse','No. 03, Lake Round, Kandy','0776548244','1992-08-04','cs@gmail.com',NULL),
+(1003,'Tom','Hans','No. 101/A, Aparekka, Matara','0784327851','1990-09-12','th@gmail.com',NULL),
+(1004,'Joe','Root','No, 23, St. Andrew Drive, Nuwara Eliya','0741182320','1990-12-30','jr@gmail.com',1002),
+(1005,'Jos','Buttler','No. 99, Godagama, Homagama, Colombo District, Colombo','0765678237','1990-09-06','jb@gmail.com',1003),
+(1006,'Ben','Stokes','No. 34/09, 1st Lane, Perakumba Road, Kurunegala','0713326589','1989-03-19','bs@gmail.com',NULL),
+(1007,'Lina','Del','No. 56/CD, Karaitivu, Jaffna','0753446781','1991-10-09','ld@gmail.com',1006),
+(1008,'Steve','Smith','No. 89, Parrawa Street, Galle','0713278754','1993-12-09','ss@gmail.com',NULL),
+(1009,'Kane','Williamson','No. 78, S. W. R. D. Bandaranayaka Mawatha, Kandy','0786433211','1993-06-19','ks@gmail.com',NULL),
+(1010,'Sara','Anderson','No. 45, Station Road, Kalutara','0754238901','1995-08-05','sa@gmail.com',1002),
+(1011,'Kara','Miller','No. 73, Deraniyagala Road, Kegalle','0786544312','1993-03-23','km@gmail.com',1003),
+(1012,'Alex','Hales','No. 7/N/3, Gammana Road, Maharagama, Colombo District, Colombo','0745872139','1991-09-27','ah@gmail.com',NULL),
+(1013,'Robert','Jackson','No. 48, Godage Mawatha, Anuradhapura','0754329771','1995-10-26','rj@gmail.com',1009),
+(1014,'Mason','Miller','No. 88, Chruch Road, Polonnaruwa','0754766322','1996-06-05','m@gmail.com',1012),
+(1015,'Sam','Rover','No. 44, Harbour Road, Matara','0723355679','1992-05-04','sr@gmail.com',NULL),
+(1016,'Deen','Samson','No. 61, 6th Avenue, Ampara','0715674321','1994-09-23','ds@gmail.com',NULL),
+(1017,'Jack','Dawson','No. 58, Hantana Pedesa Road, Kandy','0776548671','1996-09-03','jd@gmail.com',1006),
+(1018,'Paul','Peterson','No. 66, Gangaaramaya Mawatha, Gampaha','0785549085','1993-08-06','pp@gmail.com',1009),
+(1019,'Jason','Roy','No. 95, Udugama Road, Galle','0765477633','1989-07-07','jar@gmail.com',1012),
+(1020,'Mark','Cooler','No. 73, Temple Road, Kaluthara','0765547601','1985-04-10','mc@gmail.com',NULL),
+(1021,'Lisa','Holmes','No. 3123, 15th Floor, Havelock City, Colombo','0786754432','1995-06-04','lh@gmail.com',1012),
+(1022,'Jane','Hamilton','No. 81, Kovil Road, Jaffna','0763321556','1990-08-27','jh@gmail.com',NULL),
+(1023,'Cameron','Heather','No. 63, Flower Road, Dambulla','0776895432','1995-11-23','ch@gmail.com',NULL),
+(1024,'Bob','Willy','No. 54, 3rd Lane, Badulla','0743365745','1994-09-02','bw@gmail.com',1020),
+(1025,'Stuart','Broad','No. 85, Anderson Road, Nugegoda, Colombo District, Colombo','0776589768','1995-03-19','sb@gmail.com',NULL);
+
+
+
+INSERT INTO staff_position (Staff_ID,Position_ID,Assigned_date) 
+VALUES
+(1002,'S03','2021-07-23'),
+(1003,'S07','2021-08-04'),
+(1006,'S10','2021-08-07'),
+(1009,'S13','2021-08-31'),
+(1012,'S05','2021-09-09'),
+(1020,'S07','2021-09-15'),
+(1001,'S09','2021-09-20'),
+(1004,'S02','2021-10-11'),
+(1005,'S09','2021-10-15'),
+(1007,'S02','2021-10-20'),
+(1008,'S08','2021-10-30'),
+(1010,'S04','2021-11-09'),
+(1011,'S01','2021-11-15'),
+(1013,'S12','2021-11-25'),
+(1014,'S11','2021-11-27'),
+(1015,'S04','2021-11-28'),
+(1016,'S01','2021-12-02'),
+(1017,'S04','2021-12-02'),
+(1018,'S12','2021-12-10'),
+(1019,'S06','2021-12-12'),
+(1021,'S11','2021-12-14'),
+(1022,'S06','2021-12-15'),
+(1023,'S08','2021-12-22'),
+(1024,'S09','2021-12-28'),
+(1025,'S08','2021-12-30'),
+(1001,'S01','2022-12-01'),
+(1008,'S02','2022-12-01'),
+(1020,'S09','2022-12-01'),
+(1023,'S04','2022-12-01'),
+(1009,'S08','2022-12-01');
+
+
+INSERT INTO Assignment_Allocation (Project_ID,Staff_ID,Assignment_ID,Date_of_the_week,No_of_working_hours)
+VALUES
+('P01',1001,'A09','2023-12-29','4 H'),
+('P02',1004,'A11','2023-11-28','3 H'),
+('P03',1006,'A12','2024-01-25','8 H'),
+('P04',1005,'A14','2023-10-30','6 H'),
+('P05',1018,'A03','2023-12-06','5 H'),
+('P06',1007,'A12','2023-11-12','8 H'),
+('P07',1011,'A13','2024-01-06','4 H'),
+('P08',1022,'A06','2023-10-15','3 H'),
+('P09',1016,'A07','2024-01-10','7 H'),
+('P10',1012,'A06','2023-12-18','4 H'),
+('P11',1013,'A03','2023-10-28','8 H'),
+('P12',1002,'A04','2023-08-24','5 H'),
+('P13',1005,'A05','2024-01-19','2 H'),
+('P14',1010,'A02','2023-12-17','3 H'),
+('P15',1012,'A06','2023-12-20','4 H'),
+('P16',1023,'A15','2024-01-25','6 H'),
+('P17',1019,'A06','2023-10-30','1 H'),
+('P18',1003,'A08','2023-08-17','10 H'),
+('P19',1009,'A03','2024-03-12','2 H'),
+('P20',1015,'A15','2024-03-21','6 H'),
+('P02',1017,'A02','2023-11-28','4 H'),
+('P13',1019,'A09','2024-01-31','12 H'),
+('P08',1020,'A07','2023-12-06','6 H'),
+('P06',1024,'A01','2024-02-05','5 H'),
+('P16',1025,'A08','2024-02-08','8 H');
+
+
+INSERT INTO Payment (Payment_ID,Instalment_plan,Payment_amount,Payment_method,Payment_date,Payment_status,Company_Customer_ID,Individual_Customer_ID,Project_ID)
+VALUES
+('Pay01','One Time',3500000.00,'Cash','2024-02-15','Complete','CC02',NULL,'P01'),
+('Pay02','Monthly',2300000.00'Cash','2024-01-15','Have a balance','CC07',NULL,'P02'),
+('Pay03','Monthly',1200000.00,'Cash','2024-02-15','Complete','CC07',NULL,'P02'),
+('Pay04','Monthly',1100000.00,'Online Transfer','2024-03-23','Have a balance',NULL,'CI05','P03'),
+('Pay05','Monthly',1300000.00,'Online Transfer','2024-01-30','Have a balance',NULL,'CI02','P04'),
+('Pay06','One Time',1500000.00,'Cash','2024-02-12','Complete','CC04',NULL,'P05'),
+('Pay07','Monthly',1800000.00,'Cash','2023-12-13','Have a balance',NULL,'CI03','P06'),
+('Pay08','Monthly',2000000.00,'Cash','2024-01-13','Have a balance',NULL,'CI03','P06'),
+('Pay09','Monthly',1500000.00,'Cash','2024-02-13','Complete',NULL,'CI03','P06'),
+('Pay10','One Time',1000000.00,'Online Transfer','2024-01-31','Complete',NULL,'CI07','P07'),
+('Pay11','Monthly',1300000.00,'Card Payment','2024-02-20','Have a balance','CC06',NULL,'P08'),
+('Pay12','One Time',1500000.00,'Cash','2024-01-16','Complete','CC08',NULL,'P09'),
+('Pay13','One Time',1000000.00,'Card Payment','2024-02-15','Complete','CC05',NULL,'P11'),
+('Pay14','One Time',1500000.00,'Card Payment','2024-02-29','Complete',NULL,'CI04','P12'),
+('Pay15','One Time',1200000.00,'Online Transfer','2024-01-12','Complete',NULL,'CI06','P13'),
+('Pay16','Monthly',1000000.00,'Cash','2024-03-15','Have a balance','CC08',NULL,'P14'),
+('Pay17','Monthly',1500000.00,'Cash','2024-02-22','Have a balance',NULL,'CI07','P16'),
+('Pay18','One Time',3500000.00,'Cash','2023-12-27','Complete',NULL,'CI08','P18'),
+('Pay19','Yearly',5000000.00,'Online Transfer','2024-02-25','Have a balance',NULL,'CI06','P19'),
+('Pay20','Yearly',4000000.00,'Card Payment','2024-03-21','Have a balance','CC05',NULL,'P20');
+
+
+SELECT Location,ActualCom_date
+FROM Project
+WHERE (Location LIKE '%Colombo%' or Location LIKE '%Kandy%' ) AND (ActualCom_date>'2023-09-27'  AND ActualCom_date<'2024-03-27');
+
+SELECT Project.Project_ID AS 'Project Code',Customer_Company.Company_name AS 'Company Name',Project.EstimateCom_Date AS 'Estimated Completion Date', SUM(Payment.Payment_amount) AS 'Total Payments received from the ongoing renovation projects sponsored by company customers'
+FROM Project
+JOIN Customer_Company ON Project.Company_Customer_ID=Customer_Company.Company_Customer_ID
+LEFT JOIN Payment ON Project.Project_ID=Payment.Project_ID
+WHERE Project.Project_Type='Renovation' AND  Project.Current_progress='Ongoing' 
+GROUP BY Project.Project_ID,Customer_Company.Company_name,Project.EstimateCom_Date;
+
